@@ -1,0 +1,31 @@
+---
+- name: Compile and install Neovim 
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+
+  tasks:
+  - name: Install deps 
+    ansible.builtin.apt:
+      pkg:
+        - ninja-build
+        - gettext 
+        - cmake
+        - unzip 
+        - curl  
+
+  - name: Pull Neovim
+    ansible.builtin.git:
+      repo: 'https://github.com/neovim/neovim.git'
+      dest: ./neovim
+
+  - name: Compile Neovim
+    ansible.builtin.shell: cd ./neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
+
+  - name: Install Neovim 
+    ansible.builtin.shell: cd ./neovim/build && cpack -G DEB && sudo dpkg -i nvim-linux64.deb 
+
+  - name: Clean Installation
+    ansible.builtin.shell: rm -rf ./neovim
+
+
